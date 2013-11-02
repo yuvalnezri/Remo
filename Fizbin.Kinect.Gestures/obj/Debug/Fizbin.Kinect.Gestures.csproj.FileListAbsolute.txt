@@ -1,0 +1,5 @@
+C:\kinect\Fizbin.Kinect.Gestures-master\Fizbin.Kinect.Gestures\bin\Debug\Fizbin.Kinect.Gestures.dll
+C:\kinect\Fizbin.Kinect.Gestures-master\Fizbin.Kinect.Gestures\bin\Debug\Fizbin.Kinect.Gestures.pdb
+C:\kinect\Fizbin.Kinect.Gestures-master\Fizbin.Kinect.Gestures\obj\Debug\Fizbin.Kinect.Gestures.csprojResolveAssemblyReference.cache
+C:\kinect\Fizbin.Kinect.Gestures-master\Fizbin.Kinect.Gestures\obj\Debug\Fizbin.Kinect.Gestures.dll
+C:\kinect\Fizbin.Kinect.Gestures-master\Fizbin.Kinect.Gestures\obj\Debug\Fizbin.Kinect.Gestures.pdb
