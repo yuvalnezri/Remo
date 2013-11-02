@@ -13,7 +13,7 @@ namespace Fizbin.Kinect.Gestures
         /// <summary>
         /// the number of frames to pause for when a pause is initiated
         /// </summary>
-        protected int pausedFrameCount = 10;
+        public int pausedFrameCount = 10;
 
         /// <summary>
         /// The current frame that we are on
@@ -28,7 +28,7 @@ namespace Fizbin.Kinect.Gestures
         /// <summary>
         /// The name of gesture that this is
         /// </summary>
-        protected string name;
+        public string name;
 
         /// <summary>
         /// Occurs when [gesture recognised].
@@ -44,7 +44,7 @@ namespace Fizbin.Kinect.Gestures
         /// <summary>
         /// Resets this instance.
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
             this.currentGesturePart = 0;
             this.frameCount = 0;

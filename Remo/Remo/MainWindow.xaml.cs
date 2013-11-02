@@ -88,7 +88,7 @@ namespace Remo
                 // gesture consists of the same thing 10 times 
                 joinedhandsSegments[i] = joinedhandsSegment;
             }
-            gestureController.AddGesture("JoinedHands", joinedhandsSegments);
+            gestureController.AddRelativeGesture("JoinedHands", joinedhandsSegments);
 
             IRelativeGestureSegment[] menuSegments = new IRelativeGestureSegment[20];
             MenuSegment1 menuSegment = new MenuSegment1();
@@ -97,7 +97,7 @@ namespace Remo
                 // gesture consists of the same thing 20 times 
                 menuSegments[i] = menuSegment;
             }
-            gestureController.AddGesture("Menu", menuSegments);
+            gestureController.AddRelativeGesture("Menu", menuSegments);
 
             IRelativeGestureSegment[] waveRightSegments = new IRelativeGestureSegment[6];
             WaveRightSegment1 waveRightSegment1 = new WaveRightSegment1();
@@ -108,7 +108,7 @@ namespace Remo
             waveRightSegments[3] = waveRightSegment2;
             waveRightSegments[4] = waveRightSegment1;
             waveRightSegments[5] = waveRightSegment2;
-            gestureController.AddGesture("WaveRight", waveRightSegments);
+            gestureController.AddRelativeGesture("WaveRight", waveRightSegments);
 
             IRelativeGestureSegment[] waveLeftSegments = new IRelativeGestureSegment[6];
             WaveLeftSegment1 waveLeftSegment1 = new WaveLeftSegment1();
@@ -119,50 +119,52 @@ namespace Remo
             waveLeftSegments[3] = waveLeftSegment2;
             waveLeftSegments[4] = waveLeftSegment1;
             waveLeftSegments[5] = waveLeftSegment2;
-            gestureController.AddGesture("WaveLeft", waveLeftSegments);
+            gestureController.AddRelativeGesture("WaveLeft", waveLeftSegments);
 
             IRelativeGestureSegment[] zoomInSegments = new IRelativeGestureSegment[3];
             zoomInSegments[0] = new ZoomSegment1();
             zoomInSegments[1] = new ZoomSegment2();
             zoomInSegments[2] = new ZoomSegment3();
-            gestureController.AddGesture("ZoomIn", zoomInSegments);
+            gestureController.AddRelativeGesture("ZoomIn", zoomInSegments);
 
             IRelativeGestureSegment[] zoomOutSegments = new IRelativeGestureSegment[3];
             zoomOutSegments[0] = new ZoomSegment3();
             zoomOutSegments[1] = new ZoomSegment2();
             zoomOutSegments[2] = new ZoomSegment1();
-            gestureController.AddGesture("ZoomOut", zoomOutSegments);
+            gestureController.AddRelativeGesture("ZoomOut", zoomOutSegments);
 
             IRelativeGestureSegment[] swipeleftSegments = new IRelativeGestureSegment[3];
             swipeleftSegments[0] = new SwipeLeftSegment1();
             swipeleftSegments[1] = new SwipeLeftSegment2();
             swipeleftSegments[2] = new SwipeLeftSegment3();
-            gestureController.AddGesture("SwipeLeft", swipeleftSegments);
+            gestureController.AddRelativeGesture("SwipeLeft", swipeleftSegments);
 
             IRelativeGestureSegment[] swiperightSegments = new IRelativeGestureSegment[3];
             swiperightSegments[0] = new SwipeRightSegment1();
             swiperightSegments[1] = new SwipeRightSegment2();
             swiperightSegments[2] = new SwipeRightSegment3();
-            gestureController.AddGesture("SwipeRight", swiperightSegments);
+            gestureController.AddRelativeGesture("SwipeRight", swiperightSegments);
 
             IRelativeGestureSegment[] swipeUpSegments = new IRelativeGestureSegment[3];
             swipeUpSegments[0] = new SwipeUpSegment1();
             swipeUpSegments[1] = new SwipeUpSegment2();
             swipeUpSegments[2] = new SwipeUpSegment3();
-            gestureController.AddGesture("SwipeUp", swipeUpSegments);
+            gestureController.AddRelativeGesture("SwipeUp", swipeUpSegments);
 
             IRelativeGestureSegment[] swipeDownSegments = new IRelativeGestureSegment[3];
             swipeDownSegments[0] = new SwipeDownSegment1();
             swipeDownSegments[1] = new SwipeDownSegment2();
             swipeDownSegments[2] = new SwipeDownSegment3();
-            gestureController.AddGesture("SwipeDown", swipeDownSegments);
+            gestureController.AddRelativeGesture("SwipeDown", swipeDownSegments);
 
 
-            IRelativeGestureSegment[] clickSegments = new IRelativeGestureSegment[3];
+            ISemiRelativeGestureSegment[] clickSegments = new ISemiRelativeGestureSegment[3];
             clickSegments[0] = new clickSegment1();
             clickSegments[1] = new clickSegment2();
             clickSegments[2] = new clickSegment3();
-            gestureController.AddGesture("Click", clickSegments);
+            gestureController.AddSemiRelativeGesture("Click", clickSegments);
+
+            gestureController.setGesturePauseCount(20, "Click");
 
         }
 
@@ -195,6 +197,21 @@ namespace Remo
 
                     // update the gesture controller
                     gestureController.UpdateAllGestures(skeleton);
+
+                    //DEBUG - right hand z - pos
+
+                    if (!Dispatcher.CheckAccess())
+                    {
+                        Dispatcher.Invoke(() => zPosLabel.Content = ("z-Pos: " + skeleton.Joints[JointType.HandRight].Position.Z) );
+                        Dispatcher.Invoke(() => debugLabel.Content = gestureController.getGestureDebugData("Click"));
+                    }
+                    else
+                    {
+                        zPosLabel.Content = ("z-Pos: " + skeleton.Joints[JointType.HandRight].Position.Z);
+                        debugLabel.Content = gestureController.getGestureDebugData("Click");
+                    }
+
+
                 }
             }
         }

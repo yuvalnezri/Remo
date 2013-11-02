@@ -54,6 +54,18 @@ namespace Fizbin.Kinect.Gestures
             this.gestures.Add(gesture);
         }
 
+        public void setGesturePauseCount(int newFrameCount, string gestureName)
+        {
+            Gesture gesture = gestures.Find( (gest) => gest.name == gestureName);
+            gesture.pausedFrameCount = newFrameCount;
+        }
+
+        public string getGestureDebugData(string gestureName)
+        {
+            Gesture gesture = gestures.Find((gest) => gest.name == gestureName);
+            var sgesture = gesture as SemiRelativeGesture;
+            return sgesture.getGestureData();
+        }
         /// <summary>
         /// Handles the GestureRecognized event of the g control.
         /// </summary>

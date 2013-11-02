@@ -3,32 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Fizbin.Kinect.Gestures;
 using Microsoft.Kinect;
 
-namespace Remo
+namespace Fizbin.Kinect.Gestures
 {
-    public class clickSegment1 : IsemiRelativeGestureSegment
+    public class clickSegment1 : ISemiRelativeGestureSegment
     {
-        float _z;
-        public float Z
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
         {
-            get
-            {
-                return _z;
-            }
-            set
-            {
-                _z = value;
-            }
+            get { return _pausedFrameCount; }
         }
-
-        public GesturePartResult CheckGesture(Skeleton skeleton)
-        {
-            return CheckGesture(skeleton, 0);
-        }
-        
-        public GesturePartResult CheckGesture(Skeleton skeleton, float Z)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
         {
             //right hand in front of right shoulder
             if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
@@ -38,7 +24,6 @@ namespace Remo
                 {
                     if (skeleton.Joints[JointType.HandRight].Position.Z < skeleton.Joints[JointType.ShoulderRight].Position.Z)
                     {
-                        Z = skeleton.Joints[JointType.HandRight].Position.Z;
                         return GesturePartResult.Succeed;
                     }
 
@@ -52,28 +37,14 @@ namespace Remo
         }
     }
 
-    class clickSegment2 : IsemiRelativeGestureSegment
+    public class clickSegment2 : ISemiRelativeGestureSegment
     {
-
-        float _z;
-        public float Z
-        { 
-            get
-            {
-                return _z;
-            }
-            set
-            {
-                _z = value;
-            } 
-        }
-
-        public GesturePartResult CheckGesture(Skeleton skeleton)
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
         {
-            return CheckGesture(skeleton, 0);
+            get { return _pausedFrameCount; }
         }
-
-        public GesturePartResult CheckGesture(Skeleton skeleton, float prevZ)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
         {
             //right hand in front of right shoulder
             if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
@@ -81,9 +52,8 @@ namespace Remo
                 //right hand under head
                 if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y)
                 {
-                    if (skeleton.Joints[JointType.HandRight].Position.Z < prevZ - 0.3)
+                    if (skeleton.Joints[JointType.HandRight].Position.Z < prevPartZ - 0.2)
                     {
-                        Z = skeleton.Joints[JointType.HandRight].Position.Z;
                         return GesturePartResult.Succeed;
                     }
 
@@ -97,27 +67,14 @@ namespace Remo
         }
     }
 
-    class clickSegment3 : IsemiRelativeGestureSegment
+    public class clickSegment3 : ISemiRelativeGestureSegment
     {
-        float _z;
-        public float Z
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
         {
-            get
-            {
-                return _z;
-            }
-            set
-            {
-                _z = value;
-            }
+            get { return _pausedFrameCount; }
         }
-
-        public GesturePartResult CheckGesture(Skeleton skeleton)
-        {
-            return CheckGesture(skeleton, 0);
-        }
-
-        public GesturePartResult CheckGesture(Skeleton skeleton, float prevZ)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
         {
             //right hand in front of right shoulder
             if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
@@ -125,9 +82,8 @@ namespace Remo
                 //right hand under head
                 if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y)
                 {
-                    if (skeleton.Joints[JointType.HandRight].Position.Z > prevZ + 0.2)
+                    if (skeleton.Joints[JointType.HandRight].Position.Z > prevPartZ + 0.1)
                     {
-                        Z = skeleton.Joints[JointType.HandRight].Position.Z;
                         return GesturePartResult.Succeed;
                     }
 

@@ -52,6 +52,7 @@
     <Compile Include="ISemiRelativeGestureSegment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RelativeGesture.cs" />
+    <Compile Include="Segments\clickSegments.cs" />
     <Compile Include="Segments\JoinedHandsSegment.cs" />
     <Compile Include="Segments\SwipeDown\SwipeDownSegment1.cs" />
     <Compile Include="Segments\SwipeDown\SwipeDownSegment2.cs" />

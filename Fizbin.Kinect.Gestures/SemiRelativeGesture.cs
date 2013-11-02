@@ -10,7 +10,7 @@ namespace Fizbin.Kinect.Gestures
 {
     public class SemiRelativeGesture : Gesture
     {
-        private Skeleton prevSkeleton;
+        private float prevPartRightHandZ;
 
         protected  ISemiRelativeGestureSegment[] gestureParts;
 
@@ -32,52 +32,61 @@ namespace Fizbin.Kinect.Gestures
         public override void UpdateGesture(Skeleton data)
         {
             GesturePartResult result;
-            if (this.paused)
-            {
-                if (this.frameCount == this.pausedFrameCount)
-                {
-                    this.paused = false;
-                }
 
-                this.frameCount++;
-            }
-
-            result = this.gestureParts[this.currentGesturePart].CheckGesture(data, prevSkeleton);
-
+            result = this.gestureParts[this.currentGesturePart].CheckGesture(data, prevPartRightHandZ);
+            //if part succeeded
             if (result == GesturePartResult.Succeed)
             {
                 if (this.currentGesturePart + 1 < this.gestureParts.Length)
                 {
                     this.currentGesturePart++;
+                    this.prevPartRightHandZ = data.Joints[JointType.HandRight].Position.Z;
                     this.frameCount = 0;
-                    this.pausedFrameCount = 10;
                     this.paused = true;
                 }
                 else
                 {
-                    
+                    gestureRecognizedInvoker(new GestureEventArgs(this.name, data.TrackingId));
                     this.Reset();
                     
                 }
             }
-            else if (result == GesturePartResult.Fail || this.frameCount == 50)
+            else if (result == GesturePartResult.Pausing)
             {
-                this.currentGesturePart = 0;
-                this.frameCount = 0;
-                this.pausedFrameCount = 5;
+                if (this.frameCount > this.gestureParts[this.currentGesturePart].pausedFrameCount)
+                {
+                    this.Reset();
+                    return;
+                } 
+                this.frameCount++;
                 this.paused = true;
-            }
+            }    
+            //if part failed
             else
             {
-                this.frameCount++;
-                this.pausedFrameCount = 5;
-                this.paused = true;
+                this.Reset();
+                return;
             }
+            
+
         }
 
         protected override void gestureRecognizedInvoker(GestureEventArgs e)
         {
             base.gestureRecognizedInvoker(e);
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            this.prevPartRightHandZ = 0;
+        }
+
+        public string getGestureData()
+        {
+            return String.Format("name: {0}\ncurrent gesture part:{1}\nframe count:{2}\npaused frame count:{3}\nis paused: {4}\nprev z:{5}"
+                , this.name, this.currentGesturePart, this.frameCount, this.pausedFrameCount, this.paused, prevPartRightHandZ);
+            
         }
 
     }
