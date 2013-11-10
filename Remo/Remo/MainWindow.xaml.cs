@@ -129,8 +129,8 @@ namespace Remo
         /// <param name="e">event arguments.</param>
         private void OnQuitButtonClick(object sender, RoutedEventArgs e)
         {
-
-            kinectRegion.KinectSensor.Stop();
+            if (kinectRegion.KinectSensor != null)
+                kinectRegion.KinectSensor.Stop();
 
             System.Windows.Application.Current.Shutdown();
             

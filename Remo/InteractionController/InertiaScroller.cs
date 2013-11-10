@@ -33,8 +33,7 @@ namespace Interactions
         HandMovedDirection scrollDirection;
 
 
-        public event HandMovedHandler leftInertia;
-        public event HandMovedHandler rightInertia;
+        public event HandMovedHandler InertiaMove;
 
         public InertiaScroller()
         {
@@ -50,24 +49,13 @@ namespace Interactions
         {
             clickNo++;
 
-            switch (handType)
+            if (InertiaMove != null)
             {
-                case InteractionHandType.Left:
-                    if (leftInertia != null)
-                        leftInertia(this, new HandMovedEventArgs(scrollDirection, HandMovedType.inertia));
-                    break;
-                case InteractionHandType.Right:
-                    if (rightInertia != null)
-                        rightInertia(this, new HandMovedEventArgs(scrollDirection, HandMovedType.inertia));
-                    break;
-                case InteractionHandType.None:
-                    break;
-                default:
-                    break;
+                InertiaMove(this,new HandMovedEventArgs(scrollDirection,MovementType.inertia,handType));
             }
             int interval = timeInterval();
             //Debug
-            Console.WriteLine("interval: {0}\n", interval);
+            //Console.WriteLine("interval: {0}\n", interval);
             if (interval < maxInterval)
             {
                 timer.Interval = interval;

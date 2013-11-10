@@ -1,5 +1,6 @@
 ﻿using Interactions;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Toolkit.Interaction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,21 +35,20 @@ namespace Remo
 
         private void initializeManager()
         {
-            //interactionController.leftHandGrip += OnLeftHandGrip;
-            //interactionController.leftHandMoved += OnLeftHandMoved;
-            //interactionController.leftHandRelease += OnLeftHandRelease;
-            interactionController.rightHandGrip += OnRightHandGrip;
-            interactionController.rightHandMoved += OnRightHandMoved;
-            interactionController.rightHandRelease += OnRightHandRelease;
+            interactionController.handGrip += OnHandGrip;
+            interactionController.handMoved += OnHandMoved;
+            interactionController.handGripRelease += OnHandGripRelease;
 
             //TODO:see if theres a better way
-            //interactionController.addLeftHandInertiaHandler(OnLeftHandMoved);
-            interactionController.addRightHandInertiaHandler(OnRightHandMoved);
+            interactionController.addInertiaMoveHandler(OnHandMoved);
         }
 
-        private void OnLeftHandMoved(object sender, HandMovedEventArgs args)
+        private void OnHandMoved(object sender, HandMovedEventArgs args)
         {
-            if ((leftHandGripped && !rightHandGripped) || args.type == HandMovedType.inertia) 
+            //check if its one hand movement or inertia scroll
+            if ((args.handType == InteractionHandType.Left  && (leftHandGripped && !rightHandGripped)) ||
+                (args.handType == InteractionHandType.Right && (!leftHandGripped && rightHandGripped)) ||
+                (args.movementType == MovementType.inertia)) 
             {
                 switch (args.direction)
                 {
@@ -69,81 +69,30 @@ namespace Remo
                 }
 
                 //Debug
-                Console.WriteLine("left hand moved");
+                //Console.WriteLine("left hand moved");
             }
         }
 
-        private void OnRightHandMoved(object sender, HandMovedEventArgs args)
+
+        private void OnHandGrip(object sender, HandGripEventArgs args)
         {
-            if (!leftHandGripped && rightHandGripped || args.type == HandMovedType.inertia)
-            {
-                switch (args.direction)
-                {
-                    case HandMovedDirection.left:
-                        SendKeys.SendWait("{LEFT}");
-                        break;
-                    case HandMovedDirection.right:
-                        SendKeys.SendWait("{RIGHT}");
-                        break;
-                    case HandMovedDirection.up:
-                        SendKeys.SendWait("{UP}");
-                        break;
-                    case HandMovedDirection.down:
-                        SendKeys.SendWait("{DOWN}");
-                        break;
-                    default:
-                        break;
-                }
-
-
-                //Debug
-                Console.WriteLine("right hand moved");
-            }
-
+            if (args.handType == InteractionHandType.Left)
+                leftHandGripped = true;
+            if (args.handType == InteractionHandType.Right)
+                rightHandGripped = true;
+            //Debug
+            //Console.WriteLine("left hand grip");
         }
 
-        private void OnLeftHandGrip(object sender, HandGripEventArgs args)
+        private void OnHandGripRelease(object sender, HandGripReleaseEventArgs args)
         {
-            leftHandGripped = true;
+            if (args.handType == InteractionHandType.Left)
+                leftHandGripped = false;
+            if (args.handType == InteractionHandType.Right)
+                rightHandGripped = false;
 
             //Debug
-            Console.WriteLine("left hand grip");
+            //Console.WriteLine("left hand release");
         }
-
-        private void OnRightHandGrip(object sender, HandGripEventArgs args)
-        {
-            rightHandGripped = true;
-
-            //Debug
-            Console.WriteLine("right hand grip");
-        }
-
-        private void OnLeftHandRelease(object sender, HandReleaseEventArgs args)
-        {
-            leftHandGripped = false;
-
-            //Debug
-            Console.WriteLine("left hand release");
-        }
-
-        private void OnRightHandRelease(object sender, HandReleaseEventArgs args)
-        {
-            rightHandGripped = false;
-
-            //Debug
-            Console.WriteLine("right hand release");
-        }
-
-        private string getDebugData()
-        {
-            String ret = String.Format("rightGripped: {0}\n leftGripped: {1}\n",rightHandGripped,leftHandGripped);
-            if (interactionController != null)
-            {
-                ret = ret + interactionController.getDebugData();
-            }
-
-            return ret;
-        }
-
     }
 }

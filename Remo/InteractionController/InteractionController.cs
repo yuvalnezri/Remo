@@ -22,8 +22,8 @@ namespace Interactions
         private UserInfo[] _userInfos; //the information about the interactive users
 
         //variables that hold last MOVE event locations 
-        Point prevMoveLeftLocation;
-        Point prevMoveRightLocation;
+        Point prevLeftHandMoveLocation;
+        Point prevRightHandMoveLocation;
 
         Point prevFrameLeftLocation;
         Point prevFrameRightLocation;
@@ -34,7 +34,7 @@ namespace Interactions
         DateTime lastVRightMoveTime;
 
         const double horizontalSensitivity = 0.3;
-        const double verticalSensitivity = 0.25;
+        const double verticalSensitivity = 0.15;
 
         InteractionStream interactionStream;
 
@@ -42,14 +42,10 @@ namespace Interactions
 
         InertiaScroller.ScrollType scrollType;
 
-        public event GripHandler leftHandGrip;
-        public event ReleaseHandler leftHandRelease;
-        public event HandMovedHandler leftHandMoved;
-        public event HandMovedHandler leftHandIntretia;
-        public event GripHandler rightHandGrip;
-        public event ReleaseHandler rightHandRelease;
-        public event HandMovedHandler rightHandMoved;
-        public event HandMovedHandler rightHandInertia;
+        public event GripHandler handGrip;
+        public event GripReleaseHandler handGripRelease;
+        public event HandMovedHandler handMoved;
+
 
         public InteractionController()
         {
@@ -136,165 +132,153 @@ namespace Interactions
                 foreach (var hand in hands)
                 {
                     if (!hand.IsActive)
-                        break;
+                        continue;
                     if (hand.HandType == InteractionHandType.None)
-                        break;
-                    //handle left hand
-                    if (hand.HandType == InteractionHandType.Left)
-                    {
-                        prevFrameLeftLocation.X = hand.X;
-                        prevFrameLeftLocation.Y = hand.Y;
+                        continue;
 
-                        //fire right grip event
-                        if (leftHandGrip != null && hand.HandEventType == InteractionHandEventType.Grip)
-                        {
-                            //stop scrolling
-                            if (inertiaScroller.status == InertiaScroller.ScrollStatus.scrolling)
-                                inertiaScroller.stopScrolling();
-                            //fire left grip event
-                            leftHandGrip(this, new HandGripEventArgs());
-
-                        }
-                        
-                        if (hand.HandEventType == InteractionHandEventType.GripRelease)
-                        {
-                            //fire right release event
-                            if(leftHandRelease!=null)
-                                leftHandRelease(this, new HandReleaseEventArgs());
-
-                            //keep horizontal inertia scrolling
-                            if (hInertiaEnabled && scrollType == InertiaScroller.ScrollType.horizontal)
-                            {
-
-                                //with *1000 factor speed will be ~ 1<speed<8
-                                double speed = (1000 * (hand.X - prevMoveLeftLocation.X) / (DateTime.UtcNow.Subtract(lastHLeftMoveTime).Milliseconds));
-                                inertiaScroller.keepScrolling(speed, hand.HandType,scrollType);
-                                //debug
-                                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
-                            }
-
-                            //keep vertical inertia scrolling
-                            if (vInertiaEnabled && scrollType == InertiaScroller.ScrollType.vertical)
-                            {
-
-                                //with *1000 factor speed will be ~ 1<speed<8
-                                double speed = (1000 * (hand.Y - prevMoveLeftLocation.Y) / (DateTime.UtcNow.Subtract(lastVLeftMoveTime).Milliseconds));
-                                inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
-                                //debug
-                                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
-                            }
-
-                            //reset scroll Direction
-                            scrollType = InertiaScroller.ScrollType.none;
-                        }
-
-                        //handle horizontal hand movement
-                        if (leftHandMoved!=null &&  Math.Abs(hand.X - prevMoveLeftLocation.X) > horizontalSensitivity && scrollType != InertiaScroller.ScrollType.vertical )
-                        {
-                            scrollType = InertiaScroller.ScrollType.horizontal;
-                            lastHLeftMoveTime = DateTime.UtcNow;
-                            HandMovedDirection dir = (hand.X - prevMoveLeftLocation.X) > 0 ? HandMovedDirection.right : HandMovedDirection.left;
-                            var e = new HandMovedEventArgs(dir, HandMovedType.grip);
-                            leftHandMoved(this, e);
-                            prevMoveLeftLocation.X = hand.X;
-                        }
-
-                        //handle vertical hand movement
-                        if (leftHandMoved != null && Math.Abs(hand.Y - prevMoveLeftLocation.Y) > verticalSensitivity && scrollType != InertiaScroller.ScrollType.horizontal)
-                        {
-                            scrollType = InertiaScroller.ScrollType.vertical;
-                            lastVLeftMoveTime = DateTime.UtcNow;
-                            HandMovedDirection dir = (hand.Y - prevMoveLeftLocation.Y) > 0 ? HandMovedDirection.down : HandMovedDirection.up;
-                            var e = new HandMovedEventArgs(dir, HandMovedType.grip);
-                            leftHandMoved(this, e);
-                            prevMoveLeftLocation.Y = hand.Y;
-                        }
-                    }
-                    //handle right hand
-                    if (hand.HandType == InteractionHandType.Right)
-                    {
-                        prevFrameRightLocation.X = hand.X;
-                        prevFrameRightLocation.Y = hand.Y;
-
-                        if (rightHandGrip != null && hand.HandEventType == InteractionHandEventType.Grip)
-                        {
-                            //stop scrolling
-                            if (inertiaScroller.status == InertiaScroller.ScrollStatus.scrolling)
-                                inertiaScroller.stopScrolling();
-                            //fire right grip event
-                            rightHandGrip(this, new HandGripEventArgs());
-                        }
-
-                        if (rightHandRelease != null && hand.HandEventType == InteractionHandEventType.GripRelease)
-                        {
-                            //fire right release event
-                            if (rightHandRelease != null)
-                                rightHandRelease(this, new HandReleaseEventArgs());
-
-                            //keep horizontal inertia scrolling
-                            if (hInertiaEnabled && scrollType == InertiaScroller.ScrollType.horizontal )
-                            {
-                                //with *1000 factor speed will be ~ 1<speed<8
-                                double speed = (1000 * (hand.X - prevMoveRightLocation.X) / (DateTime.UtcNow.Subtract(lastHRightMoveTime).Milliseconds));
-                                inertiaScroller.keepScrolling(speed, hand.HandType,scrollType);
-                                //debug
-                                Console.WriteLine("speed: {0} type: {1}", speed,scrollType);
-                            }
-
-                            //keep vertical inertia scrolling
-                            if (vInertiaEnabled && scrollType == InertiaScroller.ScrollType.vertical)
-                            {
-                                //with *1000 factor speed will be ~ 1<speed<8
-                                double speed = (1000 * (hand.Y - prevMoveRightLocation.Y) / (DateTime.UtcNow.Subtract(lastVRightMoveTime).Milliseconds));
-                                inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
-                                //debug
-                                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
-                            }
-
-                            //reset scroll Direction
-                            scrollType = InertiaScroller.ScrollType.none;
-                        }
-
-                        //handle horizontal hand movement
-                        if (rightHandMoved != null && Math.Abs(hand.X - prevMoveRightLocation.X) > horizontalSensitivity && scrollType != InertiaScroller.ScrollType.vertical)
-                        {
-                            scrollType = InertiaScroller.ScrollType.horizontal;
-                            lastHRightMoveTime = DateTime.UtcNow;
-                            HandMovedDirection dir = (hand.X - prevMoveRightLocation.X) > 0 ? HandMovedDirection.right : HandMovedDirection.left;
-                            var e = new HandMovedEventArgs(dir, HandMovedType.grip);
-                            rightHandMoved(this, e);
-                            prevMoveRightLocation.X = hand.X;
-                        }
-
-                        //handle vertical hand movement
-                        if (rightHandMoved != null && Math.Abs(hand.Y - prevMoveRightLocation.Y) > verticalSensitivity && scrollType != InertiaScroller.ScrollType.horizontal)
-                        {
-                            scrollType = InertiaScroller.ScrollType.vertical;
-                            lastVRightMoveTime = DateTime.UtcNow;
-                            HandMovedDirection dir = (hand.Y - prevMoveRightLocation.Y) > 0 ? HandMovedDirection.down : HandMovedDirection.up;
-                            var e = new HandMovedEventArgs(dir, HandMovedType.grip);
-                            rightHandMoved(this, e);
-                            prevMoveRightLocation.Y = hand.Y;
-                        }
-                    }
+                    analyzeHandPointer(hand);
                 }
+            }
+
+        }
+
+        public void analyzeHandPointer(InteractionHandPointer hand)
+        {
+            saveHandLocation(hand);
+
+            if (hand.HandEventType == InteractionHandEventType.Grip)
+            {
+                fireGripEvent(hand);
+            }
+
+            if (hand.HandEventType == InteractionHandEventType.GripRelease)
+            {
+                fireGripReleaseEvent(hand);
+            }
+            
+            //handles all movement events(left/right/horizontal/vertical)
+            handleHandMovement(hand);
+
+        }
+
+
+
+        public void saveHandLocation(InteractionHandPointer hand)
+        {
+            if (hand.HandType == InteractionHandType.Left)
+            {
+                prevFrameLeftLocation.X = hand.X;
+                prevFrameLeftLocation.Y = hand.Y;
+            }
+            if (hand.HandType == InteractionHandType.Right)
+            {
+                prevFrameRightLocation.X = hand.X;
+                prevFrameRightLocation.Y = hand.Y;
             }
         }
 
-        public string getDebugData()
+        public void fireGripEvent(InteractionHandPointer hand)
         {
-            return string.Format("rightPrevLoc: {0}\nleftPrevLoc: {1}", prevMoveRightLocation, prevMoveLeftLocation);
+            if (handGrip != null)
+            {
+                //stop inertia scrolling
+                if (inertiaScroller.status == InertiaScroller.ScrollStatus.scrolling)
+                    inertiaScroller.stopScrolling();
+
+                //fire grip event
+                handGrip(this, new HandGripEventArgs(hand.HandType));
+            }
         }
 
-        public void addLeftHandInertiaHandler(HandMovedHandler handler)
+        public void fireGripReleaseEvent(InteractionHandPointer hand)
         {
-            inertiaScroller.leftInertia += handler;
+            if (handGripRelease != null)
+            {
+                handGripRelease(this, new HandGripReleaseEventArgs(hand.HandType));
+            }
+
+            startInertiaScroll(hand);
+
+            //clear scroll Type
+            scrollType = InertiaScroller.ScrollType.none;
         }
 
-        public void addRightHandInertiaHandler(HandMovedHandler handler)
+        public void startInertiaScroll(InteractionHandPointer hand)
         {
-            inertiaScroller.rightInertia += handler;
+            //TODO: make sure assignment is by reference!!
+            var prevMoveLocation = hand.HandType == InteractionHandType.Left ? prevLeftHandMoveLocation : prevRightHandMoveLocation; 
+            
+            //start horizontal inertia scrolling
+            if (hInertiaEnabled && scrollType == InertiaScroller.ScrollType.horizontal)
+            {
+                //with *1000 factor speed will be ~ 1<speed<8
+                double speed = (1000 * (hand.X - prevMoveLocation.X) / (DateTime.UtcNow.Subtract(lastHLeftMoveTime).Milliseconds));
+                inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
+                //Debug
+                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+            }
+
+            //keep vertical inertia scrolling
+            if (vInertiaEnabled && scrollType == InertiaScroller.ScrollType.vertical)
+            {
+
+                //with *1000 factor speed will be ~ 1<speed<8
+                double speed = (1000 * (hand.Y - prevMoveLocation.Y) / (DateTime.UtcNow.Subtract(lastVLeftMoveTime).Milliseconds));
+                inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
+                //Debug
+                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+            }
         }
+
+        public void handleHandMovement(InteractionHandPointer hand)
+        {
+            if (handMoved == null)
+                return;
+
+            Point prevMoveLocation;
+            DateTime lastHMoveTime, lastVMoveTime;
+            if (hand.HandType == InteractionHandType.Left)
+            {
+                //TODO: make sure assignment is by reference!!
+                prevMoveLocation = prevLeftHandMoveLocation;
+                lastHMoveTime = lastHLeftMoveTime;
+                lastVMoveTime = lastVLeftMoveTime;
+            }
+            else
+            {
+                prevMoveLocation = prevRightHandMoveLocation;
+                lastHMoveTime = lastHRightMoveTime;
+                lastVMoveTime = lastVRightMoveTime;
+            }
+            
+            //handle horizontal hand movement
+            if (Math.Abs(hand.X - prevMoveLocation.X) > horizontalSensitivity && scrollType != InertiaScroller.ScrollType.vertical)
+            {
+                scrollType = InertiaScroller.ScrollType.horizontal;
+                lastHMoveTime = DateTime.UtcNow;
+                HandMovedDirection dir = (hand.X - prevMoveLocation.X) > 0 ? HandMovedDirection.right : HandMovedDirection.left;
+                var e = new HandMovedEventArgs(dir, MovementType.grip,hand.HandType);
+                handMoved(this, e);
+                prevMoveLocation.X = hand.X;
+            }
+
+            //handle vertical hand movement
+            if (Math.Abs(hand.Y - prevMoveLocation.Y) > verticalSensitivity && scrollType != InertiaScroller.ScrollType.horizontal)
+            {
+                scrollType = InertiaScroller.ScrollType.vertical;
+                lastVMoveTime = DateTime.UtcNow;
+                HandMovedDirection dir = (hand.Y - prevMoveLocation.Y) > 0 ? HandMovedDirection.down : HandMovedDirection.up;
+                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType);
+                handMoved(this, e);
+                prevMoveLocation.Y = hand.Y;
+            }
+        }
+
+        public void addInertiaMoveHandler(HandMovedHandler handler)
+        {
+            inertiaScroller.InertiaMove += handler;
+        }
+
 
     }
 }

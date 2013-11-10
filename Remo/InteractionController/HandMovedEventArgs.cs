@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect.Toolkit.Interaction;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Interactions
 {
-    public delegate void ReleaseHandler(object Sender, HandReleaseEventArgs args);
+    public delegate void GripReleaseHandler(object Sender, HandGripReleaseEventArgs args);
     public delegate void HandMovedHandler(object Sender, HandMovedEventArgs args);
     public delegate void GripHandler(object Sender, HandGripEventArgs args);
     
@@ -18,7 +19,7 @@ namespace Interactions
         down
     }
 
-    public enum HandMovedType
+    public enum MovementType
     {
         grip,
         inertia
@@ -28,21 +29,33 @@ namespace Interactions
     {
         public HandMovedDirection direction;
         public string debugData;
-        public HandMovedType type;
-        public HandMovedEventArgs(HandMovedDirection dir,HandMovedType _type)
+        public MovementType movementType;
+        public InteractionHandType handType;
+             
+        public HandMovedEventArgs(HandMovedDirection dir,MovementType _movementType, InteractionHandType _handType)
         {
             direction = dir;
-            type = _type;
+            movementType = _movementType;
+            handType = _handType;
         }
     }
 
     public class HandGripEventArgs : EventArgs
     {
+        public InteractionHandType handType;
+        public HandGripEventArgs(InteractionHandType _handType)
+        {
+            handType = _handType;
+        }
 
     }
 
-    public class HandReleaseEventArgs : EventArgs
+    public class HandGripReleaseEventArgs : EventArgs
     {
-
+        public InteractionHandType handType;
+        public HandGripReleaseEventArgs(InteractionHandType _handType)
+        {
+            handType = _handType;
+        }
     }
 }
