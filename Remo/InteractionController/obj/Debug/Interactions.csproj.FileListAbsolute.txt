@@ -1,0 +1,8 @@
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\bin\Debug\Interactions.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\bin\Debug\Interactions.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\bin\Debug\Microsoft.Kinect.Toolkit.Controls.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\bin\Debug\Microsoft.Kinect.Toolkit.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\bin\Debug\Microsoft.Kinect.Toolkit.Interaction.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\obj\Debug\Interactions.csprojResolveAssemblyReference.cache
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\obj\Debug\Interactions.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\InteractionController\obj\Debug\Interactions.pdb
