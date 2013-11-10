@@ -4,6 +4,12 @@ namespace Fizbin.Kinect.Gestures.Segments
 {
     public class ZoomSegment1 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+        
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // Right and Left Hand in front of Shoulders
@@ -34,6 +40,12 @@ namespace Fizbin.Kinect.Gestures.Segments
 
     public class ZoomSegment2 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+        
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // Right and Left Hand in front of Shoulders
@@ -61,6 +73,13 @@ namespace Fizbin.Kinect.Gestures.Segments
 
     public class ZoomSegment3 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+        
+        
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // Right and Left Hand in front of Shoulders

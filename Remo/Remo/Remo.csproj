@@ -67,6 +67,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GestureManager.cs" />
+    <Compile Include="InteractionManager.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -111,6 +113,10 @@
     <ProjectReference Include="..\..\Fizbin.Kinect.Gestures\Fizbin.Kinect.Gestures.csproj">
       <Project>{7471719c-9bd5-42ba-b42b-bb5663eebbc3}</Project>
       <Name>Fizbin.Kinect.Gestures</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InteractionController\Interactions.csproj">
+      <Project>{ce807003-d520-4cfa-8926-8cf54b2c2964}</Project>
+      <Name>Interactions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

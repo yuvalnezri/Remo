@@ -11,7 +11,7 @@ namespace Fizbin.Kinect.Gestures
     public interface ISemiRelativeGestureSegment
     {
         int pausedFrameCount{get;}
-        GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ);
+        GesturePartResult CheckGesture(Skeleton skeleton, float[,] prevJointData);
 
     }
 }

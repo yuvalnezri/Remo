@@ -8,6 +8,12 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeDownSegment1 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -17,13 +23,13 @@ namespace Fizbin.Kinect.Gestures.Segments
         {
 
             // right hand in front of right shoulder
-            if (skeleton.Joints[JointType.HandRight].Position.Z < skeleton.Joints[JointType.ElbowRight].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderCenter].Position.Y)
+            if (skeleton.Joints[JointType.HandRight].Position.Z < skeleton.Joints[JointType.ElbowRight].Position.Z)
             {
                 // right hand below head height and hand higher than elbow
                 if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y && skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.ElbowRight].Position.Y)
                 {
                     // right hand right of right shoulder
-                    if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X)
+                    if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderCenter].Position.X)
                     {
                         return GesturePartResult.Succeed;
                     }

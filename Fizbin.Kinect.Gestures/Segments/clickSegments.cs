@@ -14,7 +14,7 @@ namespace Fizbin.Kinect.Gestures
         {
             get { return _pausedFrameCount; }
         }
-        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float[,] prevJointData)
         {
             //right hand in front of right shoulder
             if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
@@ -44,15 +44,18 @@ namespace Fizbin.Kinect.Gestures
         {
             get { return _pausedFrameCount; }
         }
-        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float[,] prevJointData)
         {
-            //right hand in front of right shoulder
-            if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
+            //right hand in front of right shoulder and hand didnt move too much in X axis
+            if ((skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X) &&
+                (prevJointData[(int)JointType.HandRight, 0] - 0.1 < skeleton.Joints[JointType.HandRight].Position.X) && (skeleton.Joints[JointType.HandRight].Position.X < prevJointData[(int)JointType.HandRight, 0] + 0.1))
             {
-                //right hand under head
-                if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y)
+                //right hand under head and hand didnt move too much in Y axis
+                if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y &&
+                (prevJointData[(int)JointType.HandRight, 1] - 0.1 < skeleton.Joints[JointType.HandRight].Position.Y) && (skeleton.Joints[JointType.HandRight].Position.Y < prevJointData[(int)JointType.HandRight, 1] + 0.1))
                 {
-                    if (skeleton.Joints[JointType.HandRight].Position.Z < prevPartZ - 0.2)
+                    if (skeleton.Joints[JointType.HandRight].Position.Z < prevJointData[(int)JointType.HandRight,2] - 0.07)
+                       
                     {
                         return GesturePartResult.Succeed;
                     }
@@ -74,15 +77,17 @@ namespace Fizbin.Kinect.Gestures
         {
             get { return _pausedFrameCount; }
         }
-        public GesturePartResult CheckGesture(Skeleton skeleton, float prevPartZ)
+        public GesturePartResult CheckGesture(Skeleton skeleton, float[,] prevJointData)
         {
             //right hand in front of right shoulder
-            if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X)
+            if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderLeft].Position.X &&
+                (prevJointData[(int)JointType.HandRight, 0] - 0.1 < skeleton.Joints[JointType.HandRight].Position.X) && (skeleton.Joints[JointType.HandRight].Position.X < prevJointData[(int)JointType.HandRight, 0] + 0.1))
             {
                 //right hand under head
-                if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y)
+                if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.Head].Position.Y &&
+                (prevJointData[(int)JointType.HandRight, 1] - 0.1 < skeleton.Joints[JointType.HandRight].Position.Y) && (skeleton.Joints[JointType.HandRight].Position.Y < prevJointData[(int)JointType.HandRight, 1] + 0.1))
                 {
-                    if (skeleton.Joints[JointType.HandRight].Position.Z > prevPartZ + 0.1)
+                    if (skeleton.Joints[JointType.HandRight].Position.Z > prevJointData[(int)JointType.HandRight, 2] + 0.07)
                     {
                         return GesturePartResult.Succeed;
                     }

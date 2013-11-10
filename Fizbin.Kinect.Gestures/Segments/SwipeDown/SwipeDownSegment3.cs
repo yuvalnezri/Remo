@@ -7,6 +7,12 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeDownSegment3 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -14,14 +20,14 @@ namespace Fizbin.Kinect.Gestures.Segments
         /// <returns>GesturePartResult based on if the gesture part has been completed</returns>
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
-            // //Right hand in front of right Shoulder
-            if (skeleton.Joints[JointType.HandRight].Position.Z < skeleton.Joints[JointType.ElbowRight].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderCenter].Position.Y)
+            // //Right hand in front of right elbow
+            if (skeleton.Joints[JointType.HandRight].Position.Z < skeleton.Joints[JointType.ElbowRight].Position.Z )
             {
-                // right hand below hip
-                if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.HipRight].Position.Y)
+                // right hand right of right hip
+                if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderCenter].Position.X)
                 {
-                    // right hand right of right shoulder
-                    if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.HipRight].Position.X)
+                    // right hand below elbow - 0.3
+                    if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ElbowRight].Position.Y - 0.3)
                     {
                         return GesturePartResult.Succeed;
                     }

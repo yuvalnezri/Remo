@@ -63,7 +63,7 @@ namespace Fizbin.Kinect.Gestures
         public string getGestureDebugData(string gestureName)
         {
             Gesture gesture = gestures.Find((gest) => gest.name == gestureName);
-            var sgesture = gesture as SemiRelativeGesture;
+            var sgesture = gesture as RelativeGesture;
             return sgesture.getGestureData();
         }
         /// <summary>

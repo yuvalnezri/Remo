@@ -10,7 +10,10 @@ namespace Fizbin.Kinect.Gestures
 {
     public class SemiRelativeGesture : Gesture
     {
-        private float prevPartRightHandZ;
+
+        float[,] prevJointData = new float[Enum.GetNames(typeof(JointType)).Length,3];
+
+
 
         protected  ISemiRelativeGestureSegment[] gestureParts;
 
@@ -33,14 +36,14 @@ namespace Fizbin.Kinect.Gestures
         {
             GesturePartResult result;
 
-            result = this.gestureParts[this.currentGesturePart].CheckGesture(data, prevPartRightHandZ);
+            result = this.gestureParts[this.currentGesturePart].CheckGesture(data, prevJointData);
             //if part succeeded
             if (result == GesturePartResult.Succeed)
             {
                 if (this.currentGesturePart + 1 < this.gestureParts.Length)
                 {
                     this.currentGesturePart++;
-                    this.prevPartRightHandZ = data.Joints[JointType.HandRight].Position.Z;
+                    savePrevSkeleton(data);
                     this.frameCount = 0;
                     this.paused = true;
                 }
@@ -79,16 +82,26 @@ namespace Fizbin.Kinect.Gestures
         public override void Reset()
         {
             base.Reset();
-            this.prevPartRightHandZ = 0;
         }
 
         public string getGestureData()
         {
             return String.Format("name: {0}\ncurrent gesture part:{1}\nframe count:{2}\npaused frame count:{3}\nis paused: {4}\nprev z:{5}"
-                , this.name, this.currentGesturePart, this.frameCount, this.pausedFrameCount, this.paused, prevPartRightHandZ);
+                , this.name, this.currentGesturePart, this.frameCount, this.pausedFrameCount, this.paused, prevJointData[(int)JointType.HandRight, 2]);
             
         }
 
+
+        //TODO: see if skeletonframe.copyskeletonframedata can be used
+        void savePrevSkeleton(Skeleton old)
+        {
+            foreach (Joint item in old.Joints)
+            {
+                prevJointData[(int)item.JointType,0] = item.Position.X;
+                prevJointData[(int)item.JointType,1] = item.Position.Y;
+                prevJointData[(int)item.JointType,2] = item.Position.Z;
+            }
+        }
     }
 
 

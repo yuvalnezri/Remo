@@ -12,6 +12,8 @@ namespace Fizbin.Kinect.Gestures
     /// </summary>
     public interface IRelativeGestureSegment
     {
+        int pausedFrameCount { get; }
+        
         /// <summary>
         /// Checks the gesture.
         /// </summary>

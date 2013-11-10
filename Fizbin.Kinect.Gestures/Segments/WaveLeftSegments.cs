@@ -4,6 +4,12 @@ namespace Fizbin.Kinect.Gestures.Segments
 {
     public class WaveLeftSegment1 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -31,6 +37,12 @@ namespace Fizbin.Kinect.Gestures.Segments
 
     public class WaveLeftSegment2 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>

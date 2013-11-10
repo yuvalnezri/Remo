@@ -7,6 +7,12 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeRightSegment1 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -15,7 +21,7 @@ namespace Fizbin.Kinect.Gestures.Segments
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // //left hand in front of left Shoulder
-            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.HipCenter].Position.Y)
+            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderCenter].Position.Y)
             {
                 // Debug.WriteLine("GesturePart 0 - left hand in front of left Shoulder - PASS");
                 // //left hand below shoulder height but above hip height
@@ -47,6 +53,12 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeRightSegment2 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -55,7 +67,7 @@ namespace Fizbin.Kinect.Gestures.Segments
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // //left hand in front of left Shoulder
-            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.HipCenter].Position.Y)
+            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderCenter].Position.Y)
             {
                 // Debug.WriteLine("GesturePart 1 - left hand in front of left Shoulder - PASS");
                 // /left hand below shoulder height but above hip height
@@ -87,6 +99,12 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeRightSegment3 : IRelativeGestureSegment
     {
+        const int _pausedFrameCount = 20;
+        public int pausedFrameCount
+        {
+            get { return _pausedFrameCount; }
+        }
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -95,7 +113,7 @@ namespace Fizbin.Kinect.Gestures.Segments
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
             // //left hand in front of left Shoulder
-            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.HipCenter].Position.Y)
+            if (skeleton.Joints[JointType.HandLeft].Position.Z < skeleton.Joints[JointType.ElbowLeft].Position.Z && skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderCenter].Position.Y)
             {
                 // //left hand below shoulder height but above hip height
                 if (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.Head].Position.Y && skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.HipCenter].Position.Y)

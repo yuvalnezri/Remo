@@ -17,8 +17,12 @@ C:\kinect\Remo\Remo\obj\Debug\Remo.pdb
 C:\kinect\Remo\Remo\bin\Debug\Microsoft.Kinect.Toolkit.Controls.dll
 C:\kinect\Remo\Remo\bin\Debug\Microsoft.Kinect.Toolkit.Interaction.dll
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Remo.exe.config
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.exe
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Remo.exe
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Remo.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Fizbin.Kinect.Gestures.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Interactions.dll
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Fizbin.Kinect.Gestures.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Interactions.pdb
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.csprojResolveAssemblyReference.cache
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\MainWindow.baml
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\MainWindow.g.cs
@@ -27,7 +31,5 @@ C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo_MarkupCompile.cache
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.g.resources
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.Properties.Resources.resources
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.csproj.GenerateResource.Cache
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Remo.exe
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Remo.pdb
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Fizbin.Kinect.Gestures.dll
-C:\Users\yuval\Source\Repos\Remo\Remo\Remo\bin\Debug\Fizbin.Kinect.Gestures.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.exe
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.pdb
