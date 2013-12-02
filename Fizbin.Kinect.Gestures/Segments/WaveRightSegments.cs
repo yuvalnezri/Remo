@@ -20,8 +20,8 @@ namespace Fizbin.Kinect.Gestures.Segments
             // hand above elbow
             if (skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.ElbowRight].Position.Y)
             {
-                // hand right of elbow
-                if (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ElbowRight].Position.X)
+                // hand right of elbow + 0.5
+                if (skeleton.Joints[JointType.HandRight].Position.X - skeleton.Joints[JointType.ElbowRight].Position.X > 0.05)
                 {
                     return GesturePartResult.Succeed;
                 }
@@ -53,8 +53,8 @@ namespace Fizbin.Kinect.Gestures.Segments
             // hand above elbow
             if (skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.ElbowRight].Position.Y)
             {
-                // hand right of elbow
-                if (skeleton.Joints[JointType.HandRight].Position.X < skeleton.Joints[JointType.ElbowRight].Position.X)
+                // hand left of elbow
+                if (skeleton.Joints[JointType.HandRight].Position.X - skeleton.Joints[JointType.ElbowRight].Position.X < -0.05)
                 {
                     return GesturePartResult.Succeed;
                 }

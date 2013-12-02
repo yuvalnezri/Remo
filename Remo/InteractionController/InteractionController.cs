@@ -7,6 +7,7 @@ using System.Windows;
 using Microsoft.Kinect.Toolkit;
 using Microsoft.Kinect.Toolkit.Interaction;
 using Microsoft.Kinect;
+using System.Diagnostics;
 
 namespace Interactions
 {
@@ -17,6 +18,8 @@ namespace Interactions
         //TODO: where to keep??
         const bool hInertiaEnabled = true;
         const bool vInertiaEnabled = true;
+
+        private bool IsInInterationFrame;
 
         private Skeleton[] _skeletons; //the skeletons 
         private UserInfo[] _userInfos; //the information about the interactive users
@@ -33,8 +36,75 @@ namespace Interactions
         DateTime lastVLeftMoveTime;
         DateTime lastVRightMoveTime;
 
-        const double horizontalSensitivity = 0.3;
-        const double verticalSensitivity = 0.15;
+        int framesSinceRightHandGrip;
+        int framesSinceRightHandGripRelease;
+        bool countingRightGripFrames;
+        bool countingRightGripReleaseFrames;
+
+        bool rightHandPressed = false;
+        bool leftHandPressed = false;
+
+        bool rightHandGripped;
+        bool leftHandGripped;
+
+        InteractionHandType currentHandType;
+
+        Point prevMoveLocation
+        {
+            get
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    return prevLeftHandMoveLocation;
+                else
+                    return prevRightHandMoveLocation;
+            }
+            set
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    prevLeftHandMoveLocation = value;
+                else
+                    prevRightHandMoveLocation = value;
+            }
+        }
+
+        DateTime lastHMoveTime
+        {
+            get
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    return lastHLeftMoveTime;
+                else
+                    return lastHRightMoveTime;
+            }
+            set
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    lastHLeftMoveTime = value;
+                else
+                    lastHRightMoveTime = value;
+            }
+        }
+
+        DateTime lastVMoveTime
+        {
+            get
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    return lastVLeftMoveTime;
+                else
+                    return lastVRightMoveTime;
+            }
+            set
+            {
+                if (currentHandType == InteractionHandType.Left)
+                    lastVLeftMoveTime = value;
+                else
+                    lastVRightMoveTime = value;
+            }
+        }
+
+        const double horizontalSensitivity = 0.2;
+        const double verticalSensitivity = 0.2;
 
         InteractionStream interactionStream;
 
@@ -45,6 +115,8 @@ namespace Interactions
         public event GripHandler handGrip;
         public event GripReleaseHandler handGripRelease;
         public event HandMovedHandler handMoved;
+        public event HandPressedHandler handPressed;
+
 
 
         public InteractionController()
@@ -52,6 +124,8 @@ namespace Interactions
             _skeletons = new Skeleton[6];
             _userInfos = new UserInfo[6];
             inertiaScroller = new InertiaScroller();
+            IsInInterationFrame = false;
+
         }
 
         public void setSensor(KinectSensor sensor)
@@ -125,43 +199,145 @@ namespace Interactions
                 iaf.CopyInteractionDataTo(_userInfos);
             }
 
+            if (_userInfos == null)
+                return;
 
-            foreach (var userInfo in _userInfos)
+            //this.BeginInteractionFrame();
+
+            try
             {
-                var hands = userInfo.HandPointers;
-                foreach (var hand in hands)
+
+                foreach (var userInfo in _userInfos)
                 {
-                    if (!hand.IsActive)
-                        continue;
-                    if (hand.HandType == InteractionHandType.None)
+                    if (userInfo.SkeletonTrackingId == 0)
                         continue;
 
-                    analyzeHandPointer(hand);
+                    var hands = userInfo.HandPointers;
+                    foreach (var hand in hands)
+                    {
+                        if (!hand.IsActive)
+                            continue;
+                        if (hand.HandType == InteractionHandType.None)
+                            continue;
+
+                        analyzeHandPointer(hand);
+                    }
                 }
             }
+            finally
+            {
+                //this.EndInteractionFrame();
+            }
 
+        }
+
+
+        private void BeginInteractionFrame()
+        {
+            Debug.Assert(!IsInInterationFrame);
+
+            IsInInterationFrame = true;
+        }
+
+        private void EndInteractionFrame()
+        {
+            Debug.Assert(IsInInterationFrame);
+
+            IsInInterationFrame = false;
         }
 
         public void analyzeHandPointer(InteractionHandPointer hand)
         {
             saveHandLocation(hand);
 
+            switch (hand.HandEventType)
+            {
+                case InteractionHandEventType.Grip:
+                    if (hand.HandType == InteractionHandType.Right)
+                    {
+                        if (countingRightGripReleaseFrames)
+                        {
+                            countingRightGripReleaseFrames = false;
+                            break;
+                        }
+                        countingRightGripFrames = true;
+                        framesSinceRightHandGrip = 0;
+                    }
+                    if (hand.HandType == InteractionHandType.Left)
+                        fireGripEvent(hand);
+                    break;
+                case InteractionHandEventType.GripRelease:
+                    if (hand.HandType == InteractionHandType.Right)
+                    {
+                        if (countingRightGripFrames)
+                        {
+                            countingRightGripFrames = false;
+                            break;
+                        }
+                        countingRightGripReleaseFrames = true;
+                        framesSinceRightHandGripRelease = 0;
+                    }
+                    if (hand.HandType == InteractionHandType.Left)
+                        fireGripReleaseEvent(hand);
+                    break;
+                case InteractionHandEventType.None:
+                    if (countingRightGripFrames)
+                    {
+                        framesSinceRightHandGrip++;
+                        if (framesSinceRightHandGrip > 3)
+                        {
+                            countingRightGripFrames = false;
+                            fireGripEvent(hand);
+                        }
+                    }
+                    if (countingRightGripReleaseFrames)
+                    {
+                        framesSinceRightHandGripRelease++;
+                        if (framesSinceRightHandGripRelease > 3)
+                        {
+                            countingRightGripReleaseFrames = false;
+                            fireGripReleaseEvent(hand);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
             if (hand.HandEventType == InteractionHandEventType.Grip)
             {
+                Console.WriteLine("{0} Grip frame", hand.HandType);
                 fireGripEvent(hand);
             }
 
             if (hand.HandEventType == InteractionHandEventType.GripRelease)
             {
+                Console.WriteLine("{0} GripRelease frame", hand.HandType);
                 fireGripReleaseEvent(hand);
             }
-            
+            //handle clicks
+            handleHandPress(hand);
             //handles all movement events(left/right/horizontal/vertical)
             handleHandMovement(hand);
 
         }
 
 
+        public void handleHandPress(InteractionHandPointer hand)
+        {
+            if (hand.HandType == InteractionHandType.Left && hand.IsPressed != leftHandPressed)
+            {
+                if (leftHandPressed == true && handPressed!=null)
+                    handPressed(this, new HandPressedEventArgs(hand.HandType));
+                leftHandPressed = hand.IsPressed;
+            }
+            if (hand.HandType == InteractionHandType.Right && hand.IsPressed != rightHandPressed)
+            {
+                if (rightHandPressed == true && handPressed != null)
+                    handPressed(this, new HandPressedEventArgs(hand.HandType));
+                rightHandPressed = hand.IsPressed;
+            }
+        }
 
         public void saveHandLocation(InteractionHandPointer hand)
         {
@@ -179,6 +355,7 @@ namespace Interactions
 
         public void fireGripEvent(InteractionHandPointer hand)
         {
+
             if (handGrip != null)
             {
                 //stop inertia scrolling
@@ -192,12 +369,13 @@ namespace Interactions
 
         public void fireGripReleaseEvent(InteractionHandPointer hand)
         {
+
             if (handGripRelease != null)
             {
                 handGripRelease(this, new HandGripReleaseEventArgs(hand.HandType));
             }
 
-            startInertiaScroll(hand);
+            //startInertiaScroll(hand);
 
             //clear scroll Type
             scrollType = InertiaScroller.ScrollType.none;
@@ -205,17 +383,16 @@ namespace Interactions
 
         public void startInertiaScroll(InteractionHandPointer hand)
         {
-            //TODO: make sure assignment is by reference!!
-            var prevMoveLocation = hand.HandType == InteractionHandType.Left ? prevLeftHandMoveLocation : prevRightHandMoveLocation; 
-            
+            currentHandType = hand.HandType;
+
             //start horizontal inertia scrolling
             if (hInertiaEnabled && scrollType == InertiaScroller.ScrollType.horizontal)
             {
                 //with *1000 factor speed will be ~ 1<speed<8
-                double speed = (1000 * (hand.X - prevMoveLocation.X) / (DateTime.UtcNow.Subtract(lastHLeftMoveTime).Milliseconds));
+                double speed = (1000 * (hand.X - prevMoveLocation.X) / (DateTime.UtcNow.Subtract(lastHMoveTime).Milliseconds));
                 inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
                 //Debug
-                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
             }
 
             //keep vertical inertia scrolling
@@ -223,10 +400,10 @@ namespace Interactions
             {
 
                 //with *1000 factor speed will be ~ 1<speed<8
-                double speed = (1000 * (hand.Y - prevMoveLocation.Y) / (DateTime.UtcNow.Subtract(lastVLeftMoveTime).Milliseconds));
+                double speed = (1000 * (hand.Y - prevMoveLocation.Y) / (DateTime.UtcNow.Subtract(lastVMoveTime).Milliseconds));
                 inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
                 //Debug
-                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
             }
         }
 
@@ -235,31 +412,17 @@ namespace Interactions
             if (handMoved == null)
                 return;
 
-            Point prevMoveLocation;
-            DateTime lastHMoveTime, lastVMoveTime;
-            if (hand.HandType == InteractionHandType.Left)
-            {
-                //TODO: make sure assignment is by reference!!
-                prevMoveLocation = prevLeftHandMoveLocation;
-                lastHMoveTime = lastHLeftMoveTime;
-                lastVMoveTime = lastVLeftMoveTime;
-            }
-            else
-            {
-                prevMoveLocation = prevRightHandMoveLocation;
-                lastHMoveTime = lastHRightMoveTime;
-                lastVMoveTime = lastVRightMoveTime;
-            }
-            
+            currentHandType = hand.HandType;
+
             //handle horizontal hand movement
             if (Math.Abs(hand.X - prevMoveLocation.X) > horizontalSensitivity && scrollType != InertiaScroller.ScrollType.vertical)
             {
                 scrollType = InertiaScroller.ScrollType.horizontal;
                 lastHMoveTime = DateTime.UtcNow;
                 HandMovedDirection dir = (hand.X - prevMoveLocation.X) > 0 ? HandMovedDirection.right : HandMovedDirection.left;
-                var e = new HandMovedEventArgs(dir, MovementType.grip,hand.HandType);
+                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y));
                 handMoved(this, e);
-                prevMoveLocation.X = hand.X;
+                prevMoveLocation = new Point(hand.X, hand.Y);
             }
 
             //handle vertical hand movement
@@ -268,10 +431,12 @@ namespace Interactions
                 scrollType = InertiaScroller.ScrollType.vertical;
                 lastVMoveTime = DateTime.UtcNow;
                 HandMovedDirection dir = (hand.Y - prevMoveLocation.Y) > 0 ? HandMovedDirection.down : HandMovedDirection.up;
-                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType);
+                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y));
                 handMoved(this, e);
-                prevMoveLocation.Y = hand.Y;
+                prevMoveLocation = new Point(hand.X, hand.Y);
             }
+
+
         }
 
         public void addInertiaMoveHandler(HandMovedHandler handler)

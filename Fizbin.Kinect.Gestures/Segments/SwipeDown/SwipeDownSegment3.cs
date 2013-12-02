@@ -7,7 +7,7 @@ namespace Fizbin.Kinect.Gestures.Segments
     /// </summary>
     public class SwipeDownSegment3 : IRelativeGestureSegment
     {
-        const int _pausedFrameCount = 20;
+        const int _pausedFrameCount = 5;
         public int pausedFrameCount
         {
             get { return _pausedFrameCount; }

@@ -33,3 +33,5 @@ C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.Properties.Resources.r
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.csproj.GenerateResource.Cache
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.exe
 C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\Remo.pdb
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\NotificationWindow.baml
+C:\Users\yuval\Source\Repos\Remo\Remo\Remo\obj\Debug\NotificationWindow.g.cs

@@ -15,6 +15,10 @@ namespace Remo
         // skeleton gesture recognizer
         private GestureController gestureController;
 
+        private GestureScheduler gestureScheduler;
+
+        private InteractionManager interactionManager;
+
         private KinectSensor _sensor;
 
         private Skeleton[] skeletons = new Skeleton[0];
@@ -23,19 +27,26 @@ namespace Remo
 
         public event GestureRecognizedEventHandler gestureRecognized;
 
-        public GestureManager(KinectSensor sensor)
+        public bool isPaused { get; set; }
+
+
+
+        public GestureManager(KinectSensor sensor, InteractionManager _interactionManager)
         {
             _sensor = sensor;
-            
+            interactionManager = _interactionManager;
 
             // initialize the gesture recognizer
             gestureController = new GestureController();
 
+            gestureScheduler = new GestureScheduler();
+
             RegisterGestures();
+            isPaused = false;
 
             gestureController.GestureRecognized += OnGestureRecognized;
             sensor.SkeletonFrameReady += OnSkeletonFrameReady;
-            
+
         }
 
 
@@ -78,10 +89,22 @@ namespace Remo
         /// <param name="e">Gesture event arguments.</param>
         private void OnGestureRecognized(object sender, GestureEventArgs e)
         {
-            if (gestureRecognized != null)
+
+            if (isPaused && e.GestureName == "WaveRight")
             {
+                isPaused = false;
                 gestureRecognized(this, e);
+                return;
             }
+            if (!isPaused && e.GestureName == "JoinedHands")
+            {
+                isPaused = true;
+                gestureRecognized(this, e);
+                return;
+            }
+
+            if (isPaused)
+                return;
 
             switch (e.GestureName)
             {
@@ -89,6 +112,7 @@ namespace Remo
                     break;
                 case "WaveRight":
                     SendKeys.SendWait("{ESC}");
+                    gestureRecognized(this, e);
                     break;
                 case "WaveLeft":
                     break;
@@ -103,16 +127,30 @@ namespace Remo
                 case "SwipeRight":
                     break;
                 case "SwipeUp":
+                    if (!gestureScheduler.canDoSwipeUp || interactionManager.isRightHandGripped)
+                        return;
+                    gestureScheduler.swipeUpOccured();
+                    volUp();
+                    gestureRecognized(this, e);
                     break;
                 case "SwipeDown":
+                    if (!gestureScheduler.canDoSwipeDown || interactionManager.isRightHandGripped)
+                        return;
+                    gestureScheduler.swipeDownOccured();
+                    volDown();
+                    gestureRecognized(this, e);
                     break;
                 case "Click":
+                    if (interactionManager.isRightHandGripped)
+                        return;
                     SendKeys.SendWait("{ENTER}");
+                    gestureRecognized(this, e);
                     break;
 
                 default:
                     break;
             }
+
 
         }
 
@@ -140,7 +178,7 @@ namespace Remo
                 // gesture consists of the same thing 20 times 
                 menuSegments[i] = menuSegment;
             }
-            gestureController.AddRelativeGesture("Menu", menuSegments);
+            //gestureController.AddRelativeGesture("Menu", menuSegments);
 
             IRelativeGestureSegment[] waveRightSegments = new IRelativeGestureSegment[6];
             WaveRightSegment1 waveRightSegment1 = new WaveRightSegment1();
@@ -162,31 +200,31 @@ namespace Remo
             waveLeftSegments[3] = waveLeftSegment2;
             waveLeftSegments[4] = waveLeftSegment1;
             waveLeftSegments[5] = waveLeftSegment2;
-            gestureController.AddRelativeGesture("WaveLeft", waveLeftSegments);
+            //gestureController.AddRelativeGesture("WaveLeft", waveLeftSegments);
 
             IRelativeGestureSegment[] zoomInSegments = new IRelativeGestureSegment[3];
             zoomInSegments[0] = new ZoomSegment1();
             zoomInSegments[1] = new ZoomSegment2();
             zoomInSegments[2] = new ZoomSegment3();
-            gestureController.AddRelativeGesture("ZoomIn", zoomInSegments);
+            //gestureController.AddRelativeGesture("ZoomIn", zoomInSegments);
 
             IRelativeGestureSegment[] zoomOutSegments = new IRelativeGestureSegment[3];
             zoomOutSegments[0] = new ZoomSegment3();
             zoomOutSegments[1] = new ZoomSegment2();
             zoomOutSegments[2] = new ZoomSegment1();
-            gestureController.AddRelativeGesture("ZoomOut", zoomOutSegments);
+            //gestureController.AddRelativeGesture("ZoomOut", zoomOutSegments);
 
             IRelativeGestureSegment[] swipeleftSegments = new IRelativeGestureSegment[3];
             swipeleftSegments[0] = new SwipeLeftSegment1();
             swipeleftSegments[1] = new SwipeLeftSegment2();
             swipeleftSegments[2] = new SwipeLeftSegment3();
-            gestureController.AddRelativeGesture("SwipeLeft", swipeleftSegments);
+            //gestureController.AddRelativeGesture("SwipeLeft", swipeleftSegments);
 
             IRelativeGestureSegment[] swiperightSegments = new IRelativeGestureSegment[3];
             swiperightSegments[0] = new SwipeRightSegment1();
             swiperightSegments[1] = new SwipeRightSegment2();
             swiperightSegments[2] = new SwipeRightSegment3();
-            gestureController.AddRelativeGesture("SwipeRight", swiperightSegments);
+            //gestureController.AddRelativeGesture("SwipeRight", swiperightSegments);
 
             IRelativeGestureSegment[] swipeUpSegments = new IRelativeGestureSegment[3];
             swipeUpSegments[0] = new SwipeUpSegment1();
@@ -210,6 +248,24 @@ namespace Remo
             gestureController.setGesturePauseCount(20, "Click");
 
         }
+
+        private void volUp()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                SendKeys.SendWait("{ADD}");
+            }
+        }
+
+        private void volDown()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                SendKeys.SendWait("{SUBTRACT}");
+            }
+        }
+
+
     }
 
 

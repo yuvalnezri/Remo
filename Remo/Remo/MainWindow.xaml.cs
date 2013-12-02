@@ -42,13 +42,13 @@ namespace Remo
             InitializeComponent();
 
             // add timer for clearing last detected gesture
-            _clearTimer = new System.Timers.Timer(2000);
+            _clearTimer = new System.Timers.Timer(1000);
             _clearTimer.Elapsed += new ElapsedEventHandler(clearTimer_Elapsed);
 
             Loaded += OnLoaded;
 
             this.quitButton.Click += OnQuitButtonClick;
-            this.settingsButton.Click += OnSettingsButtonClick;
+
       
         }
 
@@ -114,11 +114,12 @@ namespace Remo
             {
                 kinectRegion.KinectSensor = args.NewSensor;
 
-                gestureManager = new GestureManager(args.NewSensor);
-                gestureManager.gestureRecognized += OnGestureRecognized;
                 interactionManager = new InteractionManager(args.NewSensor);
                 interactionManager.start();
-            
+
+                gestureManager = new GestureManager(args.NewSensor,interactionManager);
+                gestureManager.gestureRecognized += OnGestureRecognized;
+
             }
         }
 
@@ -136,25 +137,6 @@ namespace Remo
             
         }
 
-        System.Timers.Timer timer;
-        int counter;
-
-        private void OnSettingsButtonClick(object sender, RoutedEventArgs e)
-        {
-            timer = new System.Timers.Timer(5000);
-            counter = 100;
-            timer.Elapsed += timer_Elapsed;
-            timer.Start();
-        }
-
-        void timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            timer.Interval = 100;
-            counter--;
-            SendKeys.SendWait("{UP}");
-            if (counter < 0)
-                timer.Stop();
-        }
 
         /// <summary>
         ///
@@ -189,6 +171,22 @@ namespace Remo
 
         public void OnGestureRecognized(object sender, GestureEventArgs e)
         {
+            if (interactionManager.isPaused && e.GestureName == "WaveRight")
+            {
+                NotificationWindow wind = new NotificationWindow("Hello");
+                wind.Show();
+                interactionManager.Start();
+               
+            }
+            if (!interactionManager.isPaused && e.GestureName == "JoinedHands")
+            {
+                NotificationWindow wind = new NotificationWindow("Bye bye..");
+                wind.Show();
+                interactionManager.Pause();
+                
+            }
+            
+            
             if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => detectedGestureLabel.Content = e.GestureName);
@@ -197,6 +195,8 @@ namespace Remo
             {
                 detectedGestureLabel.Content = e.GestureName;
             }
+
+            _clearTimer.Start();
         }
 
         #endregion

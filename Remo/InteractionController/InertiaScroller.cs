@@ -12,7 +12,7 @@ namespace Interactions
     {
         double tau;
         const double minSpeed = 1;
-        const double maxSpeed = 8;
+        const double maxSpeed = 50;
 
         const int maxInterval = 1500;
         const int minInterval = 100;

@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+
 
 namespace Interactions
 {
     public delegate void GripReleaseHandler(object Sender, HandGripReleaseEventArgs args);
     public delegate void HandMovedHandler(object Sender, HandMovedEventArgs args);
     public delegate void GripHandler(object Sender, HandGripEventArgs args);
+    public delegate void HandPressedHandler(object sender, HandPressedEventArgs args);
+    public delegate void TwoHandGripHandler(object sender, TwoHandGripEventArgs args);
     
     public enum HandMovedDirection
     {
@@ -31,12 +35,21 @@ namespace Interactions
         public string debugData;
         public MovementType movementType;
         public InteractionHandType handType;
-             
-        public HandMovedEventArgs(HandMovedDirection dir,MovementType _movementType, InteractionHandType _handType)
+        public Point location;
+
+        public HandMovedEventArgs(HandMovedDirection dir, MovementType _movementType, InteractionHandType _handType)
         {
             direction = dir;
             movementType = _movementType;
             handType = _handType;
+        }
+
+        public HandMovedEventArgs(HandMovedDirection dir,MovementType _movementType, InteractionHandType _handType ,Point _location)
+        {
+            direction = dir;
+            movementType = _movementType;
+            handType = _handType;
+            location = _location;
         }
     }
 
@@ -57,5 +70,18 @@ namespace Interactions
         {
             handType = _handType;
         }
+    }
+
+    public class HandPressedEventArgs : EventArgs
+    {
+        public InteractionHandType handType;
+        public HandPressedEventArgs(InteractionHandType _handType)
+        {
+            handType = _handType;
+        }
+    }
+
+    public class TwoHandGripEventArgs : EventArgs
+    {
     }
 }

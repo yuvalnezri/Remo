@@ -37,11 +37,14 @@ namespace Fizbin.Kinect.Gestures
             result = this.gestureParts[this.currentGesturePart].CheckGesture(data);
             if (result == GesturePartResult.Succeed)
             {
+                if (this.name == "JoinedHands")
+                    Console.WriteLine("part:{0}", this.currentGesturePart);
                 if (this.currentGesturePart + 1 < this.gestureParts.Length)
                 {
                     this.currentGesturePart++;
                     this.frameCount = 0;
                     this.paused = true;
+                    
                 }
                 else
                 {
