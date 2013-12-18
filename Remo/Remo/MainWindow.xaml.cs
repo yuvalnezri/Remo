@@ -20,6 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Interactions;
+using System.Drawing;
 
 namespace Remo
 {
@@ -30,10 +31,21 @@ namespace Remo
     {
         private KinectSensorChooser sensorChooser;
 
+        //tray icon declerations
+        private System.Windows.Forms.NotifyIcon notifyIcon = null;
+        private System.Windows.Forms.ContextMenu contextMenu;
+        private System.Windows.Forms.MenuItem menuItem1;
+        private System.Windows.Forms.MenuItem menuItem2;
+        private System.Drawing.Icon redIcon;
+        private System.Drawing.Icon greenIcon;
+
         private InteractionManager interactionManager;
 
         private GestureManager gestureManager;
 
+        private KinectSensor currentSensor;
+
+        private RemoScheduler remoScheduler;
         private System.Timers.Timer _clearTimer;
 
 
@@ -41,15 +53,65 @@ namespace Remo
         {
             InitializeComponent();
 
+            InitializeTrayIcon();
+
+            remoScheduler = new RemoScheduler();
+
             // add timer for clearing last detected gesture
             _clearTimer = new System.Timers.Timer(1000);
             _clearTimer.Elapsed += new ElapsedEventHandler(clearTimer_Elapsed);
 
             Loaded += OnLoaded;
+     
+        }
 
-            this.quitButton.Click += OnQuitButtonClick;
+        public void InitializeTrayIcon()
+        {
+            this.contextMenu = new System.Windows.Forms.ContextMenu();
+            this.menuItem1 = new System.Windows.Forms.MenuItem();
+            this.menuItem2 = new System.Windows.Forms.MenuItem();
+            redIcon = new System.Drawing.Icon("R3.ico");
+            greenIcon = new System.Drawing.Icon("G2.ico");
 
-      
+            // Initialize contextMenu1 
+            this.contextMenu.MenuItems.AddRange(
+                        new System.Windows.Forms.MenuItem[] { this.menuItem1, this.menuItem2 });
+
+            // Initialize menuItem1 
+            this.menuItem1.Index = 1;
+            this.menuItem1.Text = "E&xit";
+            this.menuItem1.Click += new System.EventHandler(this.menuItem1_Click);
+
+            // Initialize menuItem1 
+            this.menuItem2.Index = 0;
+            this.menuItem2.Text = "Enable";
+            this.menuItem2.Click += new System.EventHandler(this.menuItem2_Click);
+
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Icon = redIcon;
+            notifyIcon.Text = "Remo";
+            notifyIcon.Visible = true;
+            // The ContextMenu property sets the menu that will 
+            // appear when the systray icon is right clicked.
+            notifyIcon.ContextMenu = this.contextMenu;
+
+
+        }
+
+        private void menuItem2_Click(object sender, EventArgs e)
+        {
+            if (interactionManager.isPaused == false)
+                disableRemo();
+            else
+                enableRemo();
+        }
+
+        private void menuItem1_Click(object sender, EventArgs e)
+        {
+            if (kinectRegion.KinectSensor != null)
+                kinectRegion.KinectSensor.Stop();
+            notifyIcon.Dispose();
+            System.Windows.Application.Current.Shutdown();
         }
 
         #region EventHandlers
@@ -112,30 +174,18 @@ namespace Remo
 
             if (!error)
             {
-                kinectRegion.KinectSensor = args.NewSensor;
+                currentSensor = args.NewSensor;
+                kinectRegion.KinectSensor = currentSensor;
 
-                interactionManager = new InteractionManager(args.NewSensor);
+                interactionManager = new InteractionManager(currentSensor, remoScheduler);
                 interactionManager.start();
 
-                gestureManager = new GestureManager(args.NewSensor,interactionManager);
+                gestureManager = new GestureManager(currentSensor, interactionManager, remoScheduler);
                 gestureManager.gestureRecognized += OnGestureRecognized;
 
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e">event arguments.</param>
-        private void OnQuitButtonClick(object sender, RoutedEventArgs e)
-        {
-            if (kinectRegion.KinectSensor != null)
-                kinectRegion.KinectSensor.Stop();
-
-            System.Windows.Application.Current.Shutdown();
-            
-        }
 
 
         /// <summary>
@@ -172,19 +222,9 @@ namespace Remo
         public void OnGestureRecognized(object sender, GestureEventArgs e)
         {
             if (interactionManager.isPaused && e.GestureName == "WaveRight")
-            {
-                NotificationWindow wind = new NotificationWindow("Hello");
-                wind.Show();
-                interactionManager.Start();
-               
-            }
+                enableRemo();
             if (!interactionManager.isPaused && e.GestureName == "JoinedHands")
-            {
-                NotificationWindow wind = new NotificationWindow("Bye bye..");
-                wind.Show();
-                interactionManager.Pause();
-                
-            }
+                disableRemo();
             
             
             if (!Dispatcher.CheckAccess())
@@ -197,6 +237,26 @@ namespace Remo
             }
 
             _clearTimer.Start();
+        }
+
+        public void enableRemo()
+        {
+            NotificationWindow wind = new NotificationWindow("Hello");
+            wind.Show();
+            this.userViewerUI.Visibility = Visibility.Visible;
+            interactionManager.Start();
+            this.menuItem2.Text = "Disable";
+            notifyIcon.Icon = greenIcon;
+        }
+
+        public void disableRemo()
+        {
+            NotificationWindow wind = new NotificationWindow("Bye bye..");
+            wind.Show();
+            this.userViewerUI.Visibility = Visibility.Hidden;
+            interactionManager.Pause();
+            this.menuItem2.Text = "Enable";
+            notifyIcon.Icon = redIcon;
         }
 
         #endregion

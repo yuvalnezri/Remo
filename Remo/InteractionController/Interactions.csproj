@@ -54,6 +54,7 @@
     <Compile Include="InertiaScroller.cs" />
     <Compile Include="InteractionClient.cs" />
     <Compile Include="InteractionController.cs" />
+    <Compile Include="InteractionScheduler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

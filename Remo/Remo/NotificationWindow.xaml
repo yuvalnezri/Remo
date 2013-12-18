@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="NotificationWindow" Height="158" Width="574" Topmost="True" WindowStyle="None" AllowsTransparency="True" Background="Transparent" >
     <Grid>
-        <Label x:Name="Rona" Content="Label" HorizontalAlignment="Left" Margin="10,10,0,9" VerticalAlignment="Center" Height="139" Width="554" FontSize="72" Background="{x:Null}" Foreground="#FFC38CF9" FontWeight="Bold" FontFamily="Viner Hand ITC"/>
+        <Label x:Name="Rona" Content="Label" HorizontalAlignment="Left" Margin="20,10,0,9" VerticalAlignment="Center" Height="139" Width="554" FontSize="72" Background="{x:Null}" Foreground="#FF88D9FF" FontWeight="Bold" FontFamily="Viner Hand ITC"/>
 
     </Grid>
 </Window>

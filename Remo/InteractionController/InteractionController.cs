@@ -44,9 +44,6 @@ namespace Interactions
         bool rightHandPressed = false;
         bool leftHandPressed = false;
 
-        bool rightHandGripped;
-        bool leftHandGripped;
-
         InteractionHandType currentHandType;
 
         Point prevMoveLocation
@@ -103,8 +100,8 @@ namespace Interactions
             }
         }
 
-        const double horizontalSensitivity = 0.2;
-        const double verticalSensitivity = 0.2;
+        const double horizontalSensitivity = 0.4;
+        const double verticalSensitivity = 0.3;
 
         InteractionStream interactionStream;
 
@@ -306,13 +303,13 @@ namespace Interactions
 
             if (hand.HandEventType == InteractionHandEventType.Grip)
             {
-                Console.WriteLine("{0} Grip frame", hand.HandType);
+                //Console.WriteLine("{0} Grip frame", hand.HandType);
                 fireGripEvent(hand);
             }
 
             if (hand.HandEventType == InteractionHandEventType.GripRelease)
             {
-                Console.WriteLine("{0} GripRelease frame", hand.HandType);
+                //Console.WriteLine("{0} GripRelease frame", hand.HandType);
                 fireGripReleaseEvent(hand);
             }
             //handle clicks
@@ -392,7 +389,7 @@ namespace Interactions
                 double speed = (1000 * (hand.X - prevMoveLocation.X) / (DateTime.UtcNow.Subtract(lastHMoveTime).Milliseconds));
                 inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
                 //Debug
-                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
             }
 
             //keep vertical inertia scrolling
@@ -403,7 +400,7 @@ namespace Interactions
                 double speed = (1000 * (hand.Y - prevMoveLocation.Y) / (DateTime.UtcNow.Subtract(lastVMoveTime).Milliseconds));
                 inertiaScroller.keepScrolling(speed, hand.HandType, scrollType);
                 //Debug
-                Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
+                //Console.WriteLine("speed: {0} type: {1}", speed, scrollType);
             }
         }
 
@@ -415,23 +412,23 @@ namespace Interactions
             currentHandType = hand.HandType;
 
             //handle horizontal hand movement
-            if (Math.Abs(hand.X - prevMoveLocation.X) > horizontalSensitivity && scrollType != InertiaScroller.ScrollType.vertical)
+            if (Math.Abs(hand.X - prevMoveLocation.X) > horizontalSensitivity)
             {
-                scrollType = InertiaScroller.ScrollType.horizontal;
+                double speed = horizontalSensitivity/DateTime.Now.Subtract(lastHMoveTime).Milliseconds;
                 lastHMoveTime = DateTime.UtcNow;
                 HandMovedDirection dir = (hand.X - prevMoveLocation.X) > 0 ? HandMovedDirection.right : HandMovedDirection.left;
-                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y));
+                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y),speed);
                 handMoved(this, e);
                 prevMoveLocation = new Point(hand.X, hand.Y);
             }
 
             //handle vertical hand movement
-            if (Math.Abs(hand.Y - prevMoveLocation.Y) > verticalSensitivity && scrollType != InertiaScroller.ScrollType.horizontal)
+            if (Math.Abs(hand.Y - prevMoveLocation.Y) > verticalSensitivity)
             {
-                scrollType = InertiaScroller.ScrollType.vertical;
+                double speed = verticalSensitivity/DateTime.Now.Subtract(lastVMoveTime).Milliseconds;
                 lastVMoveTime = DateTime.UtcNow;
                 HandMovedDirection dir = (hand.Y - prevMoveLocation.Y) > 0 ? HandMovedDirection.down : HandMovedDirection.up;
-                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y));
+                var e = new HandMovedEventArgs(dir, MovementType.grip, hand.HandType, new Point(hand.X, hand.Y),speed);
                 handMoved(this, e);
                 prevMoveLocation = new Point(hand.X, hand.Y);
             }

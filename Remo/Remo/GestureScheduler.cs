@@ -12,7 +12,7 @@ namespace Remo
         public bool canDoSwipeUp;
         public bool canDoSwipeDown;
 
-        private const int waitInterval = 1000;
+        private const int waitInterval = 2000;
 
         Timer swipeUpTimer;
         Timer swipeDownTimer;
@@ -35,7 +35,7 @@ namespace Remo
 
         public void swipeUpOccured()
         {
-            Console.WriteLine("up timer started");
+            //Console.WriteLine("up timer started");
             swipeUpTimer.Start();
             canDoSwipeDown = false;
 
@@ -43,7 +43,7 @@ namespace Remo
 
         public void swipeDownOccured()
         {
-            Console.WriteLine("down timer started");
+            //Console.WriteLine("down timer started");
             swipeDownTimer.Start();
             canDoSwipeUp = false;
         }
@@ -51,14 +51,14 @@ namespace Remo
 
         void swipeUpTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("up timer ended");
+            //Console.WriteLine("up timer ended");
             canDoSwipeDown = true;
             swipeUpTimer.Stop();
         }
 
         void swipeDownTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("down timer ended");
+            //Console.WriteLine("down timer ended");
             canDoSwipeUp = true;
             swipeDownTimer.Stop();
         }

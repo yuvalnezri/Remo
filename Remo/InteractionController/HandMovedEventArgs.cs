@@ -36,6 +36,7 @@ namespace Interactions
         public MovementType movementType;
         public InteractionHandType handType;
         public Point location;
+        public double speed;
 
         public HandMovedEventArgs(HandMovedDirection dir, MovementType _movementType, InteractionHandType _handType)
         {
@@ -44,12 +45,13 @@ namespace Interactions
             handType = _handType;
         }
 
-        public HandMovedEventArgs(HandMovedDirection dir,MovementType _movementType, InteractionHandType _handType ,Point _location)
+        public HandMovedEventArgs(HandMovedDirection dir,MovementType _movementType, InteractionHandType _handType ,Point _location,double _speed)
         {
             direction = dir;
             movementType = _movementType;
             handType = _handType;
             location = _location;
+            speed = _speed;
         }
     }
 

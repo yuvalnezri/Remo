@@ -15,8 +15,6 @@ namespace Remo
         // skeleton gesture recognizer
         private GestureController gestureController;
 
-        private GestureScheduler gestureScheduler;
-
         private InteractionManager interactionManager;
 
         private KinectSensor _sensor;
@@ -29,20 +27,22 @@ namespace Remo
 
         public bool isPaused { get; set; }
 
+        RemoScheduler remoScheduler;
 
 
-        public GestureManager(KinectSensor sensor, InteractionManager _interactionManager)
+        public GestureManager(KinectSensor sensor, InteractionManager _interactionManager,RemoScheduler _remoScheduler)
         {
             _sensor = sensor;
             interactionManager = _interactionManager;
 
+            remoScheduler = _remoScheduler;
+
+
             // initialize the gesture recognizer
             gestureController = new GestureController();
 
-            gestureScheduler = new GestureScheduler();
-
             RegisterGestures();
-            isPaused = false;
+            isPaused = true;
 
             gestureController.GestureRecognized += OnGestureRecognized;
             sensor.SkeletonFrameReady += OnSkeletonFrameReady;
@@ -125,19 +125,20 @@ namespace Remo
                 case "SwipeLeft":
                     break;
                 case "SwipeRight":
+                    SendKeys.SendWait("{ADD}");
+                    remoScheduler.enterVolumeMode();
+                    gestureRecognized(this, e);
                     break;
                 case "SwipeUp":
-                    if (!gestureScheduler.canDoSwipeUp || interactionManager.isRightHandGripped)
+                    if (!remoScheduler.canDoSwipeUp || interactionManager.isRightHandGripped)
                         return;
-                    gestureScheduler.swipeUpOccured();
-                    volUp();
+                    remoScheduler.swipeUpOccured();
                     gestureRecognized(this, e);
                     break;
                 case "SwipeDown":
-                    if (!gestureScheduler.canDoSwipeDown || interactionManager.isRightHandGripped)
+                    if (!remoScheduler.canDoSwipeDown || interactionManager.isRightHandGripped)
                         return;
-                    gestureScheduler.swipeDownOccured();
-                    volDown();
+                    remoScheduler.swipeDownOccured();
                     gestureRecognized(this, e);
                     break;
                 case "Click":
@@ -224,7 +225,7 @@ namespace Remo
             swiperightSegments[0] = new SwipeRightSegment1();
             swiperightSegments[1] = new SwipeRightSegment2();
             swiperightSegments[2] = new SwipeRightSegment3();
-            //gestureController.AddRelativeGesture("SwipeRight", swiperightSegments);
+            gestureController.AddRelativeGesture("SwipeRight", swiperightSegments);
 
             IRelativeGestureSegment[] swipeUpSegments = new IRelativeGestureSegment[3];
             swipeUpSegments[0] = new SwipeUpSegment1();
@@ -247,22 +248,6 @@ namespace Remo
 
             gestureController.setGesturePauseCount(20, "Click");
 
-        }
-
-        private void volUp()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                SendKeys.SendWait("{ADD}");
-            }
-        }
-
-        private void volDown()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                SendKeys.SendWait("{SUBTRACT}");
-            }
         }
 
 
